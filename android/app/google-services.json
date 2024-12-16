@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "866599133190",
+    "project_id": "conectashoponline",
+    "storage_bucket": "conectashoponline.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866599133190:android:529dd90cd32ce7f7706387",
+        "android_client_info": {
+          "package_name": "com.conecta.shoppingonline"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1nR0sAtlPByRw_tjQJgnXrpXKFvJJ7iY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866599133190:android:b1f1b826f098e097706387",
+        "android_client_info": {
+          "package_name": "com.conecta.shoppinonline"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1nR0sAtlPByRw_tjQJgnXrpXKFvJJ7iY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
