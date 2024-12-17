@@ -11,17 +11,14 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  // Mapa para armazenar a quantidade de cada produto
   Map<String, int> productQuantities = {};
 
-  // Função para adicionar quantidade
   void _incrementQuantity(String productId) {
     setState(() {
       productQuantities[productId] = (productQuantities[productId] ?? 0) + 1;
     });
   }
 
-  // Função para remover quantidade
   void _decrementQuantity(String productId) {
     setState(() {
       if (productQuantities[productId] != null && productQuantities[productId]! > 0) {
@@ -30,14 +27,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
-  // Função para calcular o valor total
   double _calculateTotal(List<QueryDocumentSnapshot> products) {
     double total = 0.0;
 
     for (var product in products) {
       final productId = product.id;
-
-      // Certifica que o preço é um double válido
       final price = double.tryParse(product['sellingPrice'].toString()) ?? 0.0;
       final quantity = productQuantities[productId] ?? 0;
 
@@ -47,11 +41,36 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return total;
   }
 
+  void _showOptionsDialog(List<dynamic> options, String productName) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Escolha as opções - $productName'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: options.map((option) {
+              return ListTile(
+                title: Text(option['name'] ?? ''),
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Fechar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Loja da Doceria Jussara Gourmet'),
+        title: const Text('Destaques'),
       ),
       body: StreamBuilder(
         stream: widget.conectaSystemDB.collection('products').snapshots(),
@@ -69,38 +88,62 @@ class _ProductsScreenState extends State<ProductsScreen> {
           return Column(
             children: [
               Expanded(
-                child: ListView.builder(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(8.0),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 8.0,
+                    mainAxisSpacing: 8.0,
+                    childAspectRatio: 0.75,
+                  ),
                   itemCount: products.length,
                   itemBuilder: (context, index) {
                     final product = products[index];
                     final productId = product.id;
-
-                    // Quantidade atual do produto
                     final quantity = productQuantities[productId] ?? 0;
 
-                    return ListTile(
-                      leading: Image.network(
-                        product['imageUrl'] ?? '',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.image_not_supported),
-                      ),
-                      title: Text(product['name'] ?? 'Produto'),
-                      subtitle: Text(
-                          'R\$ ${double.tryParse(product['sellingPrice'].toString())?.toStringAsFixed(2) ?? '0.00'}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    final options =
+                        (product.data() as Map<String, dynamic>)['options'] ?? [];
+
+                    return Card(
+                      elevation: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove_circle_outline),
-                            onPressed: () => _decrementQuantity(productId),
+                          Expanded(
+                            child: Image.network(
+                              product['imageUrl'] ?? '',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.image_not_supported),
+                            ),
                           ),
-                          Text('$quantity', style: const TextStyle(fontSize: 16)),
-                          IconButton(
-                            icon: const Icon(Icons.add_circle_outline),
-                            onPressed: () => _incrementQuantity(productId),
+                          ListTile(
+                            title: Text(
+                              product['name'] ?? 'Produto',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                                'R\$ ${double.tryParse(product['sellingPrice'].toString())?.toStringAsFixed(2) ?? '0.00'}'),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle_outline),
+                                onPressed: () => _decrementQuantity(productId),
+                              ),
+                              Text('$quantity'),
+                              IconButton(
+                                icon: const Icon(Icons.add_circle_outline),
+                                onPressed: () => _incrementQuantity(productId),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () =>
+                                    _showOptionsDialog(options, product['name']),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -108,7 +151,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   },
                 ),
               ),
-              // Rodapé com o valor total
               Container(
                 padding: const EdgeInsets.all(16.0),
                 color: Colors.grey[200],
