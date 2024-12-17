@@ -1,8 +1,5 @@
 plugins {
     id "com.android.application"
-    // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
@@ -11,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.conecta_shopping_online"
     compileSdk = 34
-    
+
     defaultConfig {
         applicationId "com.example.conecta_shopping_online"
         minSdk = 23 // Atualize para 23 conforme o Firebase exige

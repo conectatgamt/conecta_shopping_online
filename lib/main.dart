@@ -21,14 +21,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Conecta Shopping Online',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      initialRoute: '/login', // Rota inicial é a tela de Login
+      initialRoute: '/login',
       routes: {
-        '/login': (context) => const LoginScreen(), // Tela de Login
-        '/register': (context) => const RegisterScreen(), // Tela de Cadastro
-        '/home': (context) => const HomeScreen(), // Tela Inicial (Home)
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const HomeScreen(),
       },
     );
   }
