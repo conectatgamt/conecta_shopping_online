@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'products_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final FirebaseFirestore conectaShoppingDB;
+  final FirebaseFirestore conectaSystemDB;
+
+  const HomeScreen({
+    super.key,
+    required this.conectaShoppingDB,
+    required this.conectaSystemDB,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,11 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToProducts() {
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ProductsScreen(),
-      ),
+      '/products',
     );
   }
 
@@ -62,12 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                       child: Container(
-                        height: 200, // Aumentado a altura
+                        height: 200,
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16), // Adicionado padding
+                        padding: const EdgeInsets.all(16),
                         child: Image.asset(
                           'assets/images/logo.png',
-                          fit: BoxFit.contain, // Alterado para contain
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),

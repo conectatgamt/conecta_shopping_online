@@ -33,6 +33,7 @@ dev_dependencies:
 
   # Conjunto de boas práticas recomendadas
   flutter_lints: ^5.0.0
+  mockito: ^5.4.0
 
 flutter:
   uses-material-design: true
