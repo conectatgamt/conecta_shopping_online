@@ -5,9 +5,10 @@ import 'package:conecta_shopping_online/screens/login_screen.dart';
 import 'package:conecta_shopping_online/screens/register_screen.dart';
 import 'package:conecta_shopping_online/screens/home_screen.dart';
 import 'package:conecta_shopping_online/screens/doceriajussara_screen.dart';
+import 'package:conecta_shopping_online/screens/payment_screen.dart';
 import 'firebase_options.dart';
+import 'models/cart_item.dart';
 
-// Configuração da segunda instância do Firebase (ConectaSystem)
 const FirebaseOptions conectaSystemOptions = FirebaseOptions(
   apiKey: "AIzaSyDc6lT-sHYNwKkc27rS4-m4rrsEyrMVdm4",
   appId: "1:240475601676:android:6ea05724f940e745b72729",
@@ -18,26 +19,16 @@ const FirebaseOptions conectaSystemOptions = FirebaseOptions(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Inicialização da instância principal (ConectaShoppingOnline)
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  // Inicialização da segunda instância (ConectaSystem)
   final FirebaseApp conectaSystemApp = await Firebase.initializeApp(
     name: 'ConectaSystem',
     options: conectaSystemOptions,
   );
 
-  // Obtenção do Firestore para ambas as instâncias
-  final FirebaseFirestore conectaShoppingDB = FirebaseFirestore.instance;
-  final FirebaseFirestore conectaSystemDB =
-  FirebaseFirestore.instanceFor(app: conectaSystemApp);
-
   runApp(MyApp(
-    conectaShoppingDB: conectaShoppingDB,
-    conectaSystemDB: conectaSystemDB,
+    conectaShoppingDB: FirebaseFirestore.instance,
+    conectaSystemDB: FirebaseFirestore.instanceFor(app: conectaSystemApp),
   ));
 }
 
@@ -71,6 +62,11 @@ class MyApp extends StatelessWidget {
               builder: (context) => ProductsScreen(
                 conectaSystemDB: conectaSystemDB,
               ),
+            );
+          case '/payment':
+            final cartItems = settings.arguments as List<CartItem>;
+            return MaterialPageRoute(
+              builder: (context) => PaymentScreen(cartItems: cartItems),
             );
           default:
             return null;

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'cart_screen.dart'; // Tela do carrinho
+import '../models/cart_item.dart'; // Modelo do item do carrinho
+
+// Lista global para os itens do carrinho
+final List<CartItem> globalCartItems = [];
 
 class ProductsScreen extends StatefulWidget {
   final FirebaseFirestore conectaSystemDB;
@@ -13,12 +18,14 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   Map<String, int> productQuantities = {};
 
+  // Incrementa a quantidade do produto
   void _incrementQuantity(String productId) {
     setState(() {
       productQuantities[productId] = (productQuantities[productId] ?? 0) + 1;
     });
   }
 
+  // Decrementa a quantidade do produto
   void _decrementQuantity(String productId) {
     setState(() {
       if (productQuantities[productId] != null && productQuantities[productId]! > 0) {
@@ -27,9 +34,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
+  // Calcula o valor total
   double _calculateTotal(List<QueryDocumentSnapshot> products) {
     double total = 0.0;
-
     for (var product in products) {
       final productId = product.id;
       final price = double.tryParse(product['sellingPrice'].toString()) ?? 0.0;
@@ -37,32 +44,34 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
       total += price * quantity;
     }
-
     return total;
   }
 
-  void _showOptionsDialog(List<dynamic> options, String productName) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Escolha as opções - $productName'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: options.map((option) {
-              return ListTile(
-                title: Text(option['name'] ?? ''),
-              );
-            }).toList(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Fechar'),
-            ),
-          ],
-        );
-      },
+  // Adiciona produtos selecionados ao carrinho
+  void _addToCart(List<QueryDocumentSnapshot> products) {
+    globalCartItems.clear(); // Limpa o carrinho antes de adicionar os novos itens
+
+    for (var product in products) {
+      final productId = product.id;
+      final quantity = productQuantities[productId] ?? 0;
+
+      if (quantity > 0) {
+        globalCartItems.add(CartItem(
+          name: product['name'] ?? 'Produto',
+          price: (double.tryParse(product['sellingPrice'].toString()) ?? 0.0),
+          imageUrl: product['imageUrl'] ?? '',
+          quantity: quantity,
+          options: [], // Aqui pode ser ajustado para adicionar opções selecionadas
+        ));
+      }
+    }
+
+    // Navega para a tela do carrinho
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CartScreen(cartItems: globalCartItems),
+      ),
     );
   }
 
@@ -71,6 +80,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Destaques'),
+        backgroundColor: Colors.red,
       ),
       body: StreamBuilder(
         stream: widget.conectaSystemDB.collection('products').snapshots(),
@@ -101,9 +111,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     final product = products[index];
                     final productId = product.id;
                     final quantity = productQuantities[productId] ?? 0;
-
-                    final options =
-                        (product.data() as Map<String, dynamic>)['options'] ?? [];
 
                     return Card(
                       elevation: 3,
@@ -138,11 +145,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 icon: const Icon(Icons.add_circle_outline),
                                 onPressed: () => _incrementQuantity(productId),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () =>
-                                    _showOptionsDialog(options, product['name']),
-                              ),
                             ],
                           ),
                         ],
@@ -151,19 +153,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   },
                 ),
               ),
+              // Total e botão para o carrinho
               Container(
                 padding: const EdgeInsets.all(16.0),
                 color: Colors.grey[200],
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Total:',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
                     Text(
-                      'R\$ ${_calculateTotal(products).toStringAsFixed(2)}',
+                      'Total: R\$ ${_calculateTotal(products).toStringAsFixed(2)}',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _addToCart(products),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Ir para o Carrinho'),
                     ),
                   ],
                 ),
