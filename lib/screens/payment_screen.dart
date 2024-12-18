@@ -1,45 +1,40 @@
 import 'package:flutter/material.dart';
 import '../models/cart_item.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentScreen extends StatelessWidget {
   final List<CartItem> cartItems;
 
   const PaymentScreen({super.key, required this.cartItems});
 
-  @override
-  Widget build(BuildContext context) {
-    double calculateTotal() {
-      return cartItems.fold(
-        0.0,
-            (total, item) => total + (item.price * item.quantity),
+  // Calcula o total do carrinho
+  double calculateTotal() {
+    return cartItems.fold(
+      0.0,
+          (total, item) => total + (item.price * item.quantity),
+    );
+  }
+
+  // Processa o pagamento com o Mercado Pago
+  Future<void> _processPayment(BuildContext context) async {
+    try {
+      // URL simulada para o checkout do Mercado Pago
+      const paymentUrl = "https://www.mercadopago.com.br";
+
+      // Abre o link no navegador ou aplicativo
+      if (!await launchUrl(Uri.parse(paymentUrl),
+          mode: LaunchMode.externalApplication)) {
+        throw 'Não foi possível abrir o link de pagamento.';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro no pagamento: $e")),
       );
     }
+  }
 
-    Future<void> _processPayment(BuildContext context) async {
-      try {
-        // Simulação de um link para redirecionar ao Mercado Pago
-        const paymentUrl = "https://www.mercadopago.com.br";
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Redirecionando ao Mercado Pago...")),
-        );
-
-        // Navega ou executa algo externo
-        // Aqui você deve implementar a lógica real para processar pagamentos
-        await Future.delayed(const Duration(seconds: 2));
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Pagamento processado com sucesso!")),
-        );
-
-        // Simula uma navegação para a tela final ou inicial
-        Navigator.pop(context);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro no pagamento: $e")),
-        );
-      }
-    }
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pagamento'),
