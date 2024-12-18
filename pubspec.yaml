@@ -24,9 +24,10 @@ dependencies:
   firebase_storage: ^12.3.7
   firebase_messaging: ^15.1.6
   cloud_firestore: ^5.5.1
-  url_launcher: ^6.2.4
+  url_launcher: ^6.3.1
   provider: ^6.0.5
   mercadopago_sdk: ^1.0.4
+  mercado_pago_mobile_checkout: ^0.2.1
 
 dev_dependencies:
   flutter_test:

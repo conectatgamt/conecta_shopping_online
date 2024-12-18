@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.conecta_shopping_online"
+    namespace = "com.conecta.shoppinonline"
     compileSdk = 34
 
     defaultConfig {
-        applicationId "com.example.conecta_shopping_online"
+        applicationId "com.conecta.shoppinonline"
         minSdk = 23 // Atualize para 23 conforme o Firebase exige
         targetSdk = 34
         versionCode = 1
